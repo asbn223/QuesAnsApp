@@ -2,6 +2,7 @@ import 'questions.dart';
 
 class QuesBrain {
   int _questionNum = 0;
+  int _choiceNum = 0;
 
   List<Questions> _newQuestion = [
     Questions(
@@ -23,10 +24,11 @@ class QuesBrain {
   }
 
   String getChoices() {
-    for (int i = 0; i < _newQuestion.length; i++) {
-      for (int j = 0; j < _newQuestion[_questionNum].choices.length; j++) {
-        return _newQuestion[_questionNum].choices[j];
-      }
+    _choiceNum++;
+    if (_choiceNum < _newQuestion[_questionNum].choices.length) {
+      return _newQuestion[_questionNum].choices.elementAt(_choiceNum - 1);
+    } else {
+      _choiceNum = 0;
     }
   }
 
