@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import './quesBrain.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -36,10 +37,17 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  int score;
+  int score = 0;
 
-  void scores(bool userChoices) {
+  void scores(String userChoices) {
     setState(() {
+      if (userChoices == quesBrain.getAnswer()) {
+        score = score + 10;
+        quesBrain.increaseCorrect();
+      } else {
+        quesBrain.increaseInCorrect();
+      }
+
       if (quesBrain.isFinished()) {
         Alert(
             title: "Congralutions",
@@ -55,30 +63,53 @@ class _GamePageState extends State<GamePage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               )
             ]).show();
         quesBrain.reset();
         score = 0;
       } else {
-        if (userChoices == true) {
-          score = score + 10;
-        }
+        quesBrain.nextQuestion();
       }
-      quesBrain.nextQuestion();
     });
   }
 
-  Widget choiceCard() {
-    return FlatButton(
-      child: Text(
-        quesBrain.getChoices(),
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: Colors.black,
+  Widget counter(String text) {
+    return Card(
+      child: Container(
+        color: Colors.white,
+        margin: EdgeInsets.all(3),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
+    );
+  }
+
+  Widget chioceBtn({@required String text}) {
+    return FlatButton(
+      child: Card(
+        child: Container(
+          width: 125,
+          height: 50,
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                  fontSize: 18, letterSpacing: 2, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ),
+      onPressed: () {
+        scores(text);
+      },
     );
   }
 
@@ -102,8 +133,8 @@ class _GamePageState extends State<GamePage> {
           width: 20,
         ),
         Container(
-          height: 300,
-//          width: 250,
+          height: 275,
+          width: 275,
           child: Padding(
             padding: EdgeInsets.all(10.0),
             child: Center(
@@ -113,22 +144,32 @@ class _GamePageState extends State<GamePage> {
             ),
           ),
         ),
-        Container(
-          child: Row(
-            children: <Widget>[
-              choiceCard(),
-              choiceCard(),
-            ],
-          ),
+        Row(
+          children: <Widget>[
+            chioceBtn(text: quesBrain.getChoice1()),
+            chioceBtn(text: quesBrain.getChoice2()),
+          ],
         ),
-        Container(
-          child: Row(
-            children: <Widget>[
-              choiceCard(),
-              choiceCard(),
-            ],
-          ),
+        Row(
+          children: <Widget>[
+            chioceBtn(text: quesBrain.getChoice3()),
+            chioceBtn(text: quesBrain.getChoice4()),
+          ],
         ),
+        Divider(
+          color: Colors.blueGrey,
+          thickness: 4,
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        Row(
+          children: <Widget>[
+            counter("Corrent Answer: " + quesBrain.getCorrect().toString()),
+            counter("Incorrect Answer: " + quesBrain.getInCorrect().toString()),
+          ],
+        ),
+        counter("Total Score: " + score.toString()),
       ],
     );
   }
